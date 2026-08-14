@@ -1,0 +1,10 @@
+{
+  "watch": ["src"],
+  "ignore": [
+    "workspaces/**",
+    "workspaces/**/*",
+    "**/workspaces/**",
+    "node_modules/**"
+  ],
+  "ext": "js,json"
+}

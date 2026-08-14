@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+
+# GitHub App private keys
+*.pem
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+backend/workspaces/*
+!backend/workspaces/.gitkeep
+
+dist/
+build/

@@ -1,0 +1,512 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body{
+    height: 100%;
+    width: 100%;
+}
+
+.page1{
+    height: 100%;
+    width: 100%;
+    background-color: rgb(255, 235, 235);
+}
+
+header{
+    height: 15%;
+    width: 100%;
+    /* background-color: rgb(120, 120, 124); */
+}
+
+nav{
+    height: 100%;
+    width: 100%;
+    /* background-color:hotpink ; */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* padding: 0px; */
+}
+
+.left{
+    height: 100%;
+    width: 30%;
+    /* background-color: brown; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo img{
+    cursor: pointer;
+    height: 100px;
+    transition: all 0.2s ease-in-out;
+   
+}
+
+.logo img:active{
+    scale: 0.9;
+     animation: logo 1s infinite alternate;
+}
+
+@keyframes logo {
+    0%{
+        transform: rotate(0deg);
+    }
+
+    50%{
+        transform: rotate(45deg);
+    }
+
+    100%{
+        transform: rotate(-45deg);
+    }
+}
+
+.left h1{
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    
+    font-size: 32px;
+
+
+}
+
+.right{
+    /* background-color: beige; */
+    height: 100%;
+    width: 40%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+}
+
+
+
+.right button{
+    padding: 5px;
+    height:40% ;
+    /* width: 100%; */
+}
+
+.right :first-child{
+    /* background-color: rgb(186, 186, 213); */
+    color: rgb(41, 41, 42);
+    width: 20%;
+    border-radius: 10px;
+    transition: all 0.1s ease-in-out;
+    cursor: pointer;
+    
+}
+
+.right :first-child:active{
+    scale: 0.9;
+    filter: drop-shadow(10px 3px 10px black);
+}
+
+.right :last-child{
+    /* background-color: rgb(186, 186, 213); */
+    color: rgb(41, 41, 42);
+    width: 20%;
+    border-radius: 10px;
+    transition: all 0.1s ease-in-out;
+    cursor: pointer;
+    
+}
+
+.right :last-child:active{
+    scale: 0.9;
+    filter: drop-shadow(10px 3px 10px black);
+}
+
+
+main{
+    height: 85%;
+    /* background-color: brown; */
+    display: flex;
+    flex-direction: column;
+    justify-content:center ;
+    align-items: center;
+}
+
+.start{
+    height: 60%;
+    width: 40%;
+    /* background-color: blue; */
+    display: flex;
+    align-items:center ;
+    justify-content:center ;
+}
+
+
+.cssbuttons-io-button {
+  background: #a370f0;
+  color: white;
+  font-family: inherit;
+  padding: 0.35em;
+  padding-left: 1.2em;
+  font-size: 17px;
+  font-weight: 500;
+  border-radius: 0.9em;
+  border: none;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  box-shadow: inset 0 0 1.6em -0.6em #714da6;
+  overflow: hidden;
+  position: relative;
+  height: 2.8em;
+  padding-right: 3.3em;
+  cursor: pointer;
+}
+
+.cssbuttons-io-button .icon {
+  background: white;
+  margin-left: 1em;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.2em;
+  width: 2.2em;
+  border-radius: 0.7em;
+  box-shadow: 0.1em 0.1em 0.6em 0.2em #7b52b9;
+  right: 0.3em;
+  transition: all 0.3s;
+}
+
+.cssbuttons-io-button:hover .icon {
+  width: calc(100% - 0.6em);
+}
+
+.cssbuttons-io-button .icon svg {
+  width: 1.1em;
+  transition: transform 0.3s;
+  color: #7b52b9;
+}
+
+.cssbuttons-io-button:hover .icon svg {
+  transform: translateX(0.1em);
+}
+
+.cssbuttons-io-button:active .icon {
+  transform: scale(0.95);
+}
+
+#typing{
+    color:#8b5cf6;
+    font-weight:700;
+}
+
+#typing::after{
+    content:"|";
+    animation: blink .7s infinite;
+}
+
+@keyframes blink{
+    50%{
+        opacity:0;
+    }
+}
+
+
+
+/* ===================================================== */
+/*                RESPONSIVE DESIGN - STYLE.CSS          */
+/* ===================================================== */
+
+/* ---------- Large Laptop ---------- */
+
+@media (max-width:1200px){
+
+.left{
+    width:40%;
+}
+
+.right{
+    width:45%;
+}
+
+.left h1{
+    font-size:28px;
+}
+
+.start{
+    width:60%;
+}
+
+}
+
+
+/* ---------- Laptop ---------- */
+
+@media (max-width:992px){
+
+header{
+    height:auto;
+    padding:15px 0;
+}
+
+nav{
+    flex-direction:column;
+    gap:20px;
+}
+
+.left,
+.right{
+    width:100%;
+    justify-content:center;
+}
+
+.logo img{
+    height:80px;
+}
+
+.left h1{
+    font-size:30px;
+}
+
+.right{
+    gap:20px;
+}
+
+.right button{
+    width:150px !important;
+    height:45px;
+}
+
+main{
+    padding:40px 20px;
+    text-align:center;
+}
+
+main h1{
+    font-size:42px;
+}
+
+.start{
+    width:100%;
+}
+
+}
+
+
+/* ---------- Tablet ---------- */
+
+@media (max-width:768px){
+
+.left{
+    flex-direction:column;
+    gap:10px;
+}
+
+.left h1{
+    font-size:26px;
+}
+
+.logo img{
+    height:70px;
+}
+
+.right{
+    flex-wrap:wrap;
+}
+
+.right button{
+    width:170px !important;
+}
+
+main h1{
+    font-size:34px;
+    line-height:1.4;
+}
+
+.cssbuttons-io-button{
+
+    font-size:15px;
+
+}
+
+}
+
+
+/* ---------- Large Mobile ---------- */
+
+@media (max-width:576px){
+
+.page1{
+    min-height:100vh;
+}
+
+header{
+    height:auto;
+}
+
+nav{
+    padding:15px;
+}
+
+.left{
+    text-align:center;
+}
+
+.logo img{
+    height:60px;
+}
+
+.left h1{
+    font-size:24px;
+}
+
+.right{
+
+    flex-direction:column;
+    gap:15px;
+
+}
+
+.right button{
+
+    width:220px !important;
+    height:45px;
+
+}
+
+main{
+
+    padding:20px;
+
+}
+
+main h1{
+
+    font-size:30px;
+
+}
+
+.start{
+
+    width:100%;
+
+}
+
+.cssbuttons-io-button{
+
+    font-size:14px;
+
+    width:220px;
+
+    justify-content:center;
+
+}
+
+}
+
+
+/* ---------- Mobile ---------- */
+
+@media (max-width:425px){
+
+.left h1{
+
+    font-size:22px;
+
+}
+
+main h1{
+
+    font-size:26px;
+
+}
+
+.logo img{
+
+    height:55px;
+
+}
+
+.cssbuttons-io-button{
+
+    width:200px;
+
+    font-size:13px;
+
+}
+
+.cssbuttons-io-button .icon{
+
+    width:2em;
+    height:2em;
+
+}
+
+}
+
+
+/* ---------- Small Mobile ---------- */
+
+@media (max-width:375px){
+
+main h1{
+
+    font-size:22px;
+
+}
+
+.right button{
+
+    width:180px !important;
+
+}
+
+.cssbuttons-io-button{
+
+    width:180px;
+
+    font-size:12px;
+
+}
+
+}
+
+
+/* ---------- Extra Small ---------- */
+
+@media (max-width:320px){
+
+.left h1{
+
+    font-size:20px;
+
+}
+
+main h1{
+
+    font-size:19px;
+
+}
+
+.logo img{
+
+    height:50px;
+
+}
+
+.right button{
+
+    width:160px !important;
+    font-size:13px;
+
+}
+
+.cssbuttons-io-button{
+
+    width:160px;
+    font-size:11px;
+
+}
+
+}

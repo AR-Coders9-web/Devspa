@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  --devspa-accent: #a78bfa;
+  --devspa-accent-soft: rgba(167, 139, 250, 0.20);
+  --devspa-accent-strong: rgba(167, 139, 250, 0.45);
+  color-scheme: dark;
+}
+
+:root[data-devspa-theme="midnight"] {
+  --devspa-accent: #60a5fa;
+  --devspa-accent-soft: rgba(96, 165, 250, 0.20);
+  --devspa-accent-strong: rgba(96, 165, 250, 0.45);
+}
+
+:root[data-devspa-theme="cyber"] {
+  --devspa-accent: #22d3ee;
+  --devspa-accent-soft: rgba(34, 211, 238, 0.20);
+  --devspa-accent-strong: rgba(34, 211, 238, 0.45);
+}
+
+:root[data-devspa-theme="aurora"] {
+  --devspa-accent: #34d399;
+  --devspa-accent-soft: rgba(52, 211, 153, 0.20);
+  --devspa-accent-strong: rgba(52, 211, 153, 0.45);
+}
+
+html, body, #root {
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  background: #000;
+  color: #fff;
+  overflow: hidden;
+}
+
+button, [role="button"], a {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+::selection {
+  background: var(--devspa-accent-strong);
+  color: #fff;
+}
+
+@keyframes devspaToastIn {
+  from { opacity: 0; transform: translate(-50%, 8px) scale(.97); }
+  to { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+.devspa-terminal {
+  background: #090a0c;
+}
+
+.devspa-terminal .xterm {
+  height: 100%;
+  width: 100%;
+}
+
+.devspa-terminal .xterm-viewport {
+  background: #090a0c !important;
+  overflow-y: auto !important;
+}
+
+.devspa-terminal .xterm-screen {
+  width: 100% !important;
+}
+
+.devspa-terminal .xterm-helper-textarea {
+  position: absolute !important;
+  opacity: 0;
+  pointer-events: none;
+}

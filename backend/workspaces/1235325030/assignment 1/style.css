@@ -1,0 +1,476 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+html,
+body {
+    height: 100%;
+    width: 100%;
+
+}
+
+.page1 {
+    height: 100%;
+    width: 100%;
+    background-color: #000000;
+}
+::-webkit-scrollbar{
+    display: none;
+}
+.main{
+    height: 100%;
+    width: 100%;
+    
+}
+
+
+.bar {
+    /* margin-top: 30px; */
+    height: 10%;
+    width: 100%;
+    /* background-color: aliceblue; */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px;
+
+}
+
+.logo {
+    /* background-color: #2e2626; */
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+
+}
+
+.logo img {
+    height: 150px;
+    margin-top: 10px;
+}
+
+.list {
+    height: 100%;
+    width: 50%;
+    /* background-color: #2e2626; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+ol {
+    color: aliceblue;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 50px;
+}
+
+ol li {
+    list-style-type: none;
+    text-transform: capitalize;
+    font-family: Arial, Helvetica, sans-serif;
+    cursor: pointer;
+    position: relative;
+    font-size: 18px;
+}
+
+li::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 0%;
+    height: 3px;
+    background-color: #ffffff;
+    border-radius: 3px;
+    transition: all 0.2s ease-in-out;
+}
+
+li:hover::after {
+    width: 100%;
+
+}
+
+
+/* From Uiverse.io by JaydipPrajapati1910 */
+.cssbuttons-io-button {
+    background: #000000;
+    color: white;
+    font-family: inherit;
+    padding: 0.35em;
+    padding-left: 1.2em;
+    font-size: 17px;
+    font-weight: 500;
+    border-radius: 0.9em;
+    border: none;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 0 1.6em -0.6em #848484;
+    overflow: hidden;
+    position: relative;
+    height: 2.8em;
+    cursor: pointer;
+    padding-right: 3.3em;
+}
+
+.cssbuttons-io-button .icon {
+    background: white;
+    margin-left: 1em;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.2em;
+    width: 2.2em;
+    border-radius: 0.7em;
+    box-shadow: 0.1em 0.1em 0.6em 0.2em #0000FF;
+    right: 0.3em;
+    transition: all 0.3s;
+}
+
+.cssbuttons-io-button:hover .icon {
+    width: calc(100% - 0.6em);
+}
+
+.cssbuttons-io-button .icon svg {
+    width: 1.1em;
+    transition: transform 0.3s;
+    color: #0000FF;
+}
+
+.cssbuttons-io-button:hover .icon svg {
+    transform: translateX(0.1em);
+}
+
+.cssbuttons-io-button:active .icon {
+    transform: scale(0.95);
+}
+
+.main {
+    /* background-color: rgb(50, 63, 63); */
+    /* background-color: ; */
+    height: 90%;
+    width: 100%;
+
+
+}
+
+.top-text {
+    /* background-color: #848484; */
+    height: 30%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* position: relative; */
+    top: 20px;
+
+
+}
+
+.top-text h1{
+    text-transform: capitalize;
+    font-family: 'Satoshi', sans-serif;
+    font-size: 150px;
+    color: white;
+}
+
+.sections {
+    /* background-color: aliceblue; */
+    height: 15%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 50px;
+    margin-top:20px ;
+}
+
+
+
+.sections :nth-child(1) {
+    background-color: #FC4A09;
+    color: white;
+    height: 40px;
+    width: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: capitalize;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 50px;
+}
+
+.sections h2{
+    height: 40px;
+    width: 100px;
+    background-color: #151515;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-transform: capitalize;
+    padding: 10px;
+    font-size: 20px;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.sections h2:hover{
+    background-color: white;
+    color: black;
+    filter: drop-shadow(5px 0px 20px white);
+    cursor: pointer;
+}
+.card-conti {
+    height: 70%;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    gap: 10px;
+    /* padding: 5px; */
+
+}
+
+.card{
+    margin-top: 20px;
+    height: 350px;
+    width: 25%;
+    background-color: #0E0E0E;
+    display: flex;
+    flex-direction: column;
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+.card .imge{
+    background-color: #000000;
+    height: 60%;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 25px;
+ 
+}
+.card .imge img{
+    /* background-size: cover; */
+    height: 100%;
+    /* width: ; */
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+    
+}
+
+.card-bottom{
+    margin-top: 10px;
+    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    color: #ffffff;
+    gap: 10px;
+}
+
+.card-bottom .btn-c{
+    /* background-color: #848484; */
+}
+
+.card-bottom .btn-c h2{
+    background-color: #fc4a0992;
+    text-transform: capitalize;
+    display: inline-block;
+    /* width: ; */
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.card-text {
+
+    width: 80%;
+    /* background-color: #000000; */
+}
+
+.card-text p{
+    font-size: 20px;
+    text-transform: capitalize;
+}
+
+.date h2{
+
+    font-size: 12px;
+    color: #ffffff92;
+}
+
+/* ========================= */
+/* RESPONSIVE DESIGN */
+/* ========================= */
+
+@media (max-width:1200px){
+
+    .top-text h1{
+        font-size: 110px;
+        text-align: center;
+    }
+
+    .card{
+        width: 30%;
+    }
+
+}
+
+
+@media (max-width:992px){
+
+    .bar{
+        padding: 15px;
+    }
+
+    .logo img{
+        height: 120px;
+    }
+
+    .list{
+        width: 60%;
+    }
+
+    ol{
+        gap: 25px;
+    }
+
+    .top-text h1{
+        font-size: 80px;
+    }
+
+    .sections{
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .card-conti{
+        flex-wrap: wrap;
+        padding-bottom: 40px;
+    }
+
+    .card{
+        width: 45%;
+    }
+
+}
+
+
+@media (max-width:768px){
+
+    .page1{
+        height: auto;
+        padding-bottom: 40px;
+    }
+
+    .bar{
+        flex-direction: column;
+        height: auto;
+        gap: 20px;
+    }
+
+    .logo{
+        height: auto;
+    }
+
+    .logo img{
+        height: 100px;
+    }
+
+    .list{
+        width: 100%;
+    }
+
+    ol{
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    ol li{
+        font-size: 15px;
+    }
+
+    .btn{
+        margin-top: 10px;
+    }
+
+    .top-text{
+        height: auto;
+        padding: 20px;
+    }
+
+    .top-text h1{
+        font-size: 60px;
+        line-height: 1;
+    }
+
+    .sections{
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .sections h2{
+        width: 90px;
+        font-size: 16px;
+    }
+
+    .card-conti{
+        height: auto;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .card{
+        width: 90%;
+        height: auto;
+    }
+
+    .card .imge{
+        height: 250px;
+    }
+
+}
+
+
+@media (max-width:480px){
+
+    .top-text h1{
+        font-size: 42px;
+    }
+
+    .sections{
+        gap: 10px;
+    }
+
+    .sections h2{
+        width: 80px;
+        height: 35px;
+        font-size: 14px;
+    }
+
+    .card{
+        border-radius: 20px;
+    }
+
+    .card-text p{
+        font-size: 18px;
+    }
+
+    .cssbuttons-io-button{
+        font-size: 14px;
+    }
+
+}

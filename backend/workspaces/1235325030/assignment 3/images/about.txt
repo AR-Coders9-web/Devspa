@@ -1,0 +1,6 @@
+This favicon was generated using the following font:
+
+- Font Title: Inria Sans
+- Font Author: undefined
+- Font Source: https://fonts.gstatic.com/s/inriasans/v14/ptRMTiqXYfZMCOiVj9kQ5O7yKQNute8.ttf
+- Font License: undefined)
