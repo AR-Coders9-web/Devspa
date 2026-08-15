@@ -6,6 +6,7 @@ const session = require("express-session");
 const crypto = require("node:crypto");
 const http = require("http");
 const createTerminalWebSocket = require("./terminal/terminalWebSocket");
+const { getWorkspacePath } = require("./services/githubImportService");
 
 // Existing DEVSPA routes — KEEP THESE
 const githubAuthRoutes = require("./routes/githubAuthRoutes");
@@ -730,11 +731,14 @@ const httpServer = http.createServer(app);
 createTerminalWebSocket({
   server: httpServer,
 
-  // Terminal workspace resolution.
-  // For now the terminal opens from the backend working directory.
-  // You can later map this to your imported project workspace.
-  getWorkspace: (_workspaceId) => {
-    return process.env.DEVSPA_TERMINAL_CWD || process.cwd();
+  // Resolve each terminal to its imported DEVSPA workspace.
+  // Keep the backend root only as a safe fallback when no workspace is provided.
+  getWorkspace: (workspaceId) => {
+    if (!workspaceId) {
+      return process.cwd();
+    }
+
+    return getWorkspacePath(workspaceId);
   },
 });
 
