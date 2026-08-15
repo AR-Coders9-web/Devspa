@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useCallback,
   useEffect,
   useRef,
@@ -17,7 +17,7 @@ import "@xterm/xterm/css/xterm.css";
 
 const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ||
-  "http://localhost:5000";
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 const TerminalPanel = ({
   workspaceId = "default",
@@ -329,7 +329,7 @@ const TerminalPanel = ({
         setStatus("connected");
 
         terminal.writeln(
-          "\x1b[32m✓ Connected\x1b[0m"
+          "\x1b[32mâœ“ Connected\x1b[0m"
         );
 
         terminal.writeln("");
@@ -385,7 +385,7 @@ const TerminalPanel = ({
 
             case "error":
               terminal.writeln(
-                `\r\n\x1b[31m✕ ${message.message}\x1b[0m`
+                `\r\n\x1b[31mâœ• ${message.message}\x1b[0m`
               );
 
               break;
@@ -427,7 +427,7 @@ const TerminalPanel = ({
         setStatus("error");
 
         terminal.writeln(
-          "\r\n\x1b[31m✕ Terminal connection error.\x1b[0m"
+          "\r\n\x1b[31mâœ• Terminal connection error.\x1b[0m"
         );
       };
 
@@ -489,7 +489,7 @@ const TerminalPanel = ({
     connect();
 
     // ================================================
-    // CLICK → FOCUS
+    // CLICK â†’ FOCUS
     // ================================================
 
     const handleFocus =

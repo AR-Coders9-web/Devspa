@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+﻿import React, { useCallback, useEffect, useState } from "react";
 import Wallpaper from "../os/Wallpaper";
 import Desktop from "../os/Desktop";
 import WindowManager from "../os/WindowManager";
@@ -284,7 +284,7 @@ const Devspa = () => {
   }, [handleWorkspaceChange, openWindow, workspace]);
 
   const handleAssistantTool = useCallback(async (command) => {
-    const API_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:5000";
+    const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
     const context = {
       workspaceId: workspace.workspaceId,
       repository: workspace.repository,
@@ -307,7 +307,7 @@ const Devspa = () => {
       }
 
       return {
-        message: body.message || "I’m ready.",
+        message: body.message || "Iâ€™m ready.",
         tool: body.action
           ? {
               ...body.action,

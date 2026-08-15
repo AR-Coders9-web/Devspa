@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Folder,
   FolderOpen,
@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 
 const API_BASE =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 const STORAGE_KEY = "devspa:explorer:v1";
 const REPOSITORIES_KEY = "devspa:explorer:repositories:v1";
@@ -731,7 +731,7 @@ export default function Explorer({
     if (String(drive.workspaceId) === String(currentWorkspaceId)) return;
 
     setDriveLoading(true);
-    setNotice(`Opening ${drive.fullName || drive.name}…`);
+    setNotice(`Opening ${drive.fullName || drive.name}â€¦`);
 
     try {
       // Reuse the existing import API so the backend remains the single source
@@ -1107,7 +1107,7 @@ export default function Explorer({
           </div>
         ) : tree.length === 0 ? (
           <div className="flex h-full items-center justify-center text-[10px] text-white/25">
-            No files match “{search}”
+            No files match â€œ{search}â€
           </div>
         ) : (
           tree.map((node) => (
@@ -1151,7 +1151,7 @@ export default function Explorer({
           <span>{currentRepository ? "Workspace ready" : "No workspace"}</span>
           {changedFiles.length > 0 && (
             <>
-              <span className="text-white/10">•</span>
+              <span className="text-white/10">â€¢</span>
               <span className="text-amber-300/60">
                 {changedFiles.length} pending
               </span>
@@ -1231,7 +1231,7 @@ export default function Explorer({
                   className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-[10px] font-semibold text-black transition hover:bg-white/90 disabled:pointer-events-none disabled:opacity-30"
                 >
                   {importLoading && <Loader2 className="h-3 w-3 animate-spin" />}
-                  {importLoading ? "Importing…" : "Import repository"}
+                  {importLoading ? "Importingâ€¦" : "Import repository"}
                 </button>
               </div>
             </div>
@@ -1320,7 +1320,7 @@ export default function Explorer({
                   className="flex items-center gap-2 rounded-lg bg-emerald-300 px-4 py-2 text-[10px] font-semibold text-black transition hover:bg-emerald-200 disabled:pointer-events-none disabled:opacity-30"
                 >
                   {commitLoading && <Loader2 className="h-3 w-3 animate-spin" />}
-                  {commitLoading ? "Committing…" : "Commit & Push"}
+                  {commitLoading ? "Committingâ€¦" : "Commit & Push"}
                 </button>
               </div>
             </div>
@@ -1330,3 +1330,4 @@ export default function Explorer({
     </div>
   );
 }
+

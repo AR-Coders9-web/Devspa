@@ -1,9 +1,9 @@
-import React from "react";
+﻿import React from "react";
 // import { Github } from "lucide-react";
 
 const Login = () => {
   const handleGithubLogin = () => {
-    window.location.href = "http://localhost:5000/auth/github";
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/auth/github`;
   };
 
   return (
@@ -30,7 +30,7 @@ const Login = () => {
       <button
   type="button"
   onClick={() => {
-    window.location.href = "http://localhost:5000/auth/github";
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/auth/github`;
   }}
   className="
     w-full

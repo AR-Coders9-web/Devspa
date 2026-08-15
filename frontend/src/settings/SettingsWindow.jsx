@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import {
   LogOut,
   User,
@@ -51,7 +51,7 @@ const SettingsWindow = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:5000/auth/logout", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL || "http://localhost:5000"}/auth/logout`, {
         method: "POST",
         credentials: "include",
       });

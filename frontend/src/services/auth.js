@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";
+﻿const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 export const loginWithGithub = () => {
   window.location.href = `${API_URL}/auth/github`;

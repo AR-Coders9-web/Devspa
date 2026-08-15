@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { Power, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const API_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 function BootScreen({ onBootComplete }) {
 
     const navigate = useNavigate();

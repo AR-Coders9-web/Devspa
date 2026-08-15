@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 
-const API_URL = "http://localhost:5000";
+const API_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 const ProtectedRoute = ({ children }) => {
   const [authState, setAuthState] = useState({
@@ -70,7 +70,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Not authenticated → login
+  // Not authenticated â†’ login
   if (!authState.authenticated) {
     return (
       <Navigate
@@ -81,7 +81,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Authenticated → render protected page
+  // Authenticated â†’ render protected page
   return children;
 };
 
