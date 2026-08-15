@@ -10,6 +10,9 @@ const {
 } = require('../controllers/githubImportController');
 
 const router = express.Router();
+
+// Workspace identity is established inside the controller so existing frontend
+// URLs and route contracts remain unchanged during this migration.
 router.post('/import', importGithubRepository);
 router.get('/workspace/:workspaceId', getGithubWorkspace);
 router.delete('/workspace', clearGithubWorkspace);

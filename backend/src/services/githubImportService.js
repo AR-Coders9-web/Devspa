@@ -374,7 +374,8 @@ const getWorkspaceSnapshot = async (workspaceId) => {
 
 const importRepository = async (
   repoUrl,
-  accessToken = null
+  accessToken = null,
+  principal = null
 ) => {
   const { owner, repo } =
     parseRepositoryUrl(repoUrl);
@@ -396,7 +397,12 @@ const importRepository = async (
     repository.default_branch || 'main';
 
   const workspaceId =
-    sanitizeWorkspaceId(repository.id);
+    principal?.id
+      ? require('./workspaceIdentityService').createWorkspaceId(
+          principal.id,
+          repository.id
+        )
+      : sanitizeWorkspaceId(repository.id);
 
   const workspaceRoot =
     getWorkspacePath(workspaceId);
@@ -561,7 +567,12 @@ const importRepository = async (
         repo,
         branch: defaultBranch,
         repositoryId: repository.id,
-        fullName: repository.full_name
+        fullName: repository.full_name,
+        ownerPrincipalId: principal?.id || null,
+        ownerGithubInstallationId: principal?.githubInstallationId || null,
+        ownerGithubLogin: principal?.githubLogin || null,
+        workspaceVersion: 2,
+        createdAt: new Date().toISOString()
       },
       null,
       2

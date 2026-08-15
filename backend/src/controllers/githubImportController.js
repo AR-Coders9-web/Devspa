@@ -1,4 +1,4 @@
-const path = require("path");
+﻿const path = require("path");
 const fs = require("fs/promises");
 
 const {
@@ -20,6 +20,11 @@ const {
   createInstallationToken,
   getRepositoryInstallation,
 } = require("../services/githubAppService");
+
+const {
+  getSessionPrincipal,
+  assertWorkspaceAccess,
+} = require("../services/workspaceIdentityService");
 
 /* =========================================================
    HELPERS
@@ -201,6 +206,8 @@ const importGithubRepository =
         req.body?.repoUrl || ""
       ).trim();
 
+      const principal = getSessionPrincipal(req);
+
       if (!repoUrl) {
         return res.status(400).json({
           success: false,
@@ -233,7 +240,8 @@ const importGithubRepository =
       const result =
         await importRepository(
           repoUrl,
-          accessToken
+          accessToken,
+          principal
         );
 
       console.log(
@@ -282,6 +290,19 @@ const importGithubRepository =
     }
   };
 
+const authorizeWorkspaceRequest = async (req, workspaceId) => {
+  const principal = getSessionPrincipal(req);
+  const workspacePath = getWorkspacePath(workspaceId);
+
+  const access = await assertWorkspaceAccess({
+    workspaceRoot: workspacePath,
+    principalId: principal.id,
+    allowLegacy: true,
+  });
+
+  return { principal, workspacePath, access };
+};
+
 /* =========================================================
    GET WORKSPACE SNAPSHOT
 ========================================================= */
@@ -297,6 +318,8 @@ const getGithubWorkspace = async (req, res) => {
       });
     }
 
+    await authorizeWorkspaceRequest(req, workspaceId);
+
     const result = await getWorkspaceSnapshot(workspaceId);
 
     return res.json({
@@ -306,7 +329,7 @@ const getGithubWorkspace = async (req, res) => {
   } catch (error) {
     console.error('Get GitHub workspace error:', error);
 
-    return res.status(404).json({
+    return res.status(error?.status || 404).json({
       success: false,
       message: error?.message || 'Workspace not found.',
     });
@@ -341,10 +364,7 @@ const clearGithubWorkspace =
         });
       }
 
-      const workspacePath =
-        getWorkspacePath(
-          workspaceId
-        );
+      const workspacePath = getWorkspacePath(workspaceId);
 
       const root =
         path.resolve(
@@ -408,7 +428,7 @@ await fs.rm(
         error
       );
 
-      return res.status(500).json({
+      return res.status(error?.status || 500).json({
         success: false,
         message:
           error?.message ||
@@ -447,6 +467,8 @@ const saveWorkspace =
         });
       }
 
+      await authorizeWorkspaceRequest(req, workspaceId);
+
       const result =
         await saveWorkspaceFiles(
           workspaceId,
@@ -465,7 +487,7 @@ const saveWorkspace =
         error
       );
 
-      return res.status(500).json({
+      return res.status(error?.status || 500).json({
         success: false,
         message:
           error?.message ||
@@ -502,6 +524,8 @@ const getWorkspaceFile =
             "Workspace and file path are required.",
         });
       }
+
+      await authorizeWorkspaceRequest(req, workspaceId);
 
       const buffer =
         await readWorkspaceFile(
@@ -570,11 +594,12 @@ const getWorkspaceFile =
       );
 
       const status =
-        /Invalid workspace file path/i.test(
+        error?.status ||
+        (/Invalid workspace file path/i.test(
           error?.message || ""
         )
           ? 400
-          : 404;
+          : 404);
 
       return res.status(status).json({
         success: false,
@@ -601,6 +626,8 @@ const deleteWorkspaceFile = async (req, res) => {
       });
     }
 
+    await authorizeWorkspaceRequest(req, workspaceId);
+
     if (!relativePath) {
       return res.status(400).json({
         success: false,
@@ -621,7 +648,7 @@ const deleteWorkspaceFile = async (req, res) => {
     console.error("Workspace file delete error:", error);
 
     const message = error?.message || "Failed to delete workspace file.";
-    const status = /not found/i.test(message) ? 404 : /Invalid workspace file path/i.test(message) ? 400 : 500;
+    const status = error?.status || (/not found/i.test(message) ? 404 : /Invalid workspace file path/i.test(message) ? 400 : 500);
 
     return res.status(status).json({
       success: false,
