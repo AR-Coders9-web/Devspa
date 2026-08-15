@@ -23,26 +23,18 @@ function App() {
       {/* DEVSPA OS */}
       <Route
         path="/home"
-        element={<Devspa />}
+        element={
+          <ProtectedRoute>
+            <Devspa />
+          </ProtectedRoute>
+        }
       />
-
-      <Route
-  path="/home"
-  element={
-    <ProtectedRoute>
-      <Devspa />
-    </ProtectedRoute>
-  }
-/>
-
 
       {/* Unknown routes */}
       <Route
         path="*"
         element={<Navigate to="/login" replace />}
       />
-
-
     </Routes>
   );
 }
