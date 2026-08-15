@@ -1,9 +1,9 @@
 import React from "react";
 
 const stateCopy = {
-  running: "Running tool…",
-  success: "Completed",
-  error: "Failed",
+  running: "Processing matrix...",
+  success: "Execution successful",
+  error: "Process terminated",
 };
 
 export default function ToolExecution({ tool }) {
@@ -13,34 +13,34 @@ export default function ToolExecution({ tool }) {
 
   return (
     <div
-      className={`animate-[slideUp_.22s_ease-out] rounded-2xl border bg-[#0d1016]/95 p-3 shadow-2xl shadow-black/40 backdrop-blur-xl ${
+      className={`relative animate-[slideUp_.3s_ease-out] overflow-hidden rounded-2xl border bg-[#050508]/70 p-3 shadow-[0_8px_32px_rgba(0,0,0,0.5)] backdrop-blur-2xl transition-all duration-500 ${
         error
-          ? "border-red-400/15"
+          ? "border-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.05)]"
           : success
-            ? "border-emerald-400/15"
-            : "border-violet-400/15"
+            ? "border-emerald-500/20 shadow-[0_0_20px_rgba(16,185,129,0.05)]"
+            : "border-cyan-500/20 shadow-[0_0_20px_rgba(6,182,212,0.05)]"
       }`}
     >
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-3 relative z-10">
         <div
-          className={`grid h-7 w-7 place-items-center rounded-lg text-[10px] ${
+          className={`grid h-8 w-8 place-items-center rounded-xl border text-[12px] shadow-inner transition-all duration-300 ${
             error
-              ? "bg-red-400/[0.08] text-red-300"
+              ? "border-red-500/30 bg-red-500/[0.05] text-red-400 shadow-red-500/10"
               : success
-                ? "bg-emerald-400/[0.08] text-emerald-300"
-                : "bg-violet-400/[0.08] text-violet-300"
+                ? "border-emerald-500/30 bg-emerald-500/[0.05] text-emerald-400 shadow-emerald-500/10"
+                : "border-cyan-500/30 bg-cyan-500/[0.05] text-cyan-400 shadow-cyan-500/10"
           }`}
         >
-          {error ? "×" : success ? "✓" : "✦"}
+          {error ? "✕" : success ? "✓" : <span className="animate-[spin_3s_linear_infinite]">✧</span>}
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="truncate text-[9px] font-medium text-white/60">
-            {tool?.name || tool?.type || "DEVSPA tool"}
+          <div className="truncate text-[10px] font-semibold tracking-wider text-white/70">
+            {tool?.name || tool?.type || "System Process"}
           </div>
-          <div className="mt-0.5 flex items-center gap-1 text-[8px] text-white/25">
+          <div className="mt-1 flex items-center gap-1.5 text-[9px] uppercase tracking-widest text-white/30">
             {!success && !error && (
-              <span className="h-1 w-1 animate-pulse rounded-full bg-violet-300" />
+              <span className="h-1.5 w-1.5 animate-ping rounded-full bg-cyan-400/80" />
             )}
             {stateCopy[state] || state}
           </div>
@@ -48,7 +48,7 @@ export default function ToolExecution({ tool }) {
       </div>
 
       {tool?.result?.message && (
-        <p className="mt-2 border-t border-white/[0.05] pt-2 text-[8px] leading-4 text-white/30">
+        <p className="relative z-10 mt-3 border-t border-white/[0.05] pt-3 text-[9px] leading-5 text-white/40">
           {String(tool.result.message)}
         </p>
       )}

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import VoiceButton from "./VoiceButton";
 
 export default function AssistantInput({
@@ -8,72 +8,56 @@ export default function AssistantInput({
   listening,
   setListening,
   onVoiceResult,
-  disabled = false,
-  voiceMode = false,
-  autoStartVoice = false,
+  disabled,
+  voiceMode,
   onToggleVoiceMode,
+  autoStart,
+  onVoiceError,
 }) {
-  const inputRef = useRef(null);
-  const submit = () => onSubmit?.(value, { voice: false });
+  const textareaRef = useRef(null);
 
-  const handleKeyDown = (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      submit();
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
+    }
+  }, [value]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSubmit();
     }
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl">
-      <div
-        className={`group relative flex min-h-12 items-center gap-2 rounded-2xl border bg-[#080c12]/90 px-2.5 py-2 shadow-[0_12px_50px_rgba(0,0,0,.28)] transition-all duration-300 ${
-          disabled
-            ? "border-white/[0.05] opacity-70"
-            : "border-cyan-300/[0.09] focus-within:border-cyan-300/25 focus-within:bg-cyan-300/[0.025] focus-within:shadow-[0_0_35px_rgba(34,211,238,.05)]"
-        }`}
-      >
-        <span className="pointer-events-none absolute left-4 top-0 h-px w-16 bg-gradient-to-r from-transparent via-cyan-200/30 to-transparent transition-all duration-500 group-focus-within:w-32" />
-
-        <VoiceButton
-          listening={listening}
-          disabled={disabled}
-          setListening={setListening}
-          onResult={onVoiceResult}
-          voiceMode={voiceMode}
-          autoStart={autoStartVoice}
-          onToggleVoiceMode={onToggleVoiceMode}
-        />
-
+    <div className="mx-auto w-full max-w-4xl">
+      <div className={`relative flex items-end gap-3 rounded-2xl border bg-[#0d1017]/90 px-4 py-3 shadow-[0_8px_30px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all ${disabled ? "border-white/[0.05] opacity-60" : "border-white/[0.1] focus-within:border-cyan-500/30"}`}>
+        <div className="pb-1">
+          <VoiceButton listening={listening} setListening={setListening} onResult={onVoiceResult} disabled={disabled}
+            voiceMode={voiceMode}
+            onToggleVoiceMode={onToggleVoiceMode}
+            autoStart={autoStart}
+            onError={onVoiceError}
+          />
+        </div>
         <textarea
-          ref={inputRef}
+          ref={textareaRef}
           rows={1}
           value={value}
-          disabled={disabled || voiceMode}
-          onChange={(event) => onChange?.(event.target.value)}
+          onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={
-            voiceMode ? "Voice channel active — speak naturally..." : "Ask DEVSPA anything..."
-          }
-          className="max-h-28 min-h-7 flex-1 resize-none bg-transparent px-1 py-1 text-[10px] leading-5 text-white/80 outline-none placeholder:text-white/20 disabled:cursor-not-allowed"
+          disabled={disabled || voiceMode}
+          placeholder={voiceMode ? "Voice mode active..." : "Ask DEVSPA AI..."}
+          className="max-h-[200px] w-full resize-none bg-transparent py-1.5 text-sm text-white outline-none placeholder:text-white/30 scrollbar-thin scrollbar-thumb-white/10"
         />
-
         <button
-          type="button"
-          onClick={submit}
-          disabled={disabled || voiceMode || !String(value || "").trim()}
-          aria-label="Send message"
-          title="Send message"
-          className="group/send relative grid h-8 w-8 shrink-0 cursor-pointer place-items-center overflow-hidden rounded-xl border border-cyan-200/15 bg-cyan-100/[0.92] text-black transition-all hover:scale-105 hover:bg-white disabled:cursor-not-allowed disabled:opacity-20"
+          onClick={() => onSubmit()}
+          disabled={disabled || voiceMode || !value.trim()}
+          className="mb-1 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white text-black transition-all hover:scale-105 disabled:opacity-20"
         >
-          <span className="absolute inset-0 translate-y-full bg-cyan-200 transition-transform duration-300 group-hover/send:translate-y-0" />
-          <span className="relative text-[13px]">↑</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </button>
-      </div>
-
-      <div className="mt-2 flex items-center justify-center gap-2 text-[7px] uppercase tracking-[0.18em] text-white/15">
-        <span className="h-px w-8 bg-white/[0.05]" />
-        Secure neural channel
-        <span className="h-px w-8 bg-white/[0.05]" />
       </div>
     </div>
   );

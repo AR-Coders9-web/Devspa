@@ -1,73 +1,75 @@
-import React from "react";
+import React, { useState } from "react";
 
-const formatTime = (time) => {
-  if (!time) return "";
-  try {
-    return new Intl.DateTimeFormat(undefined, {
-      hour: "2-digit",
-      minute: "2-digit",
-    }).format(new Date(time));
-  } catch {
-    return "";
-  }
-};
-
-export default function AssistantMessage({ message, onOpenFile }) {
-  const user = message?.role === "user";
-  const content = String(message?.content ?? "");
+const CodeBlock = ({ lang, code }) => {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
-    <article
-      className={`flex animate-[messageIn_.28s_ease-out] ${
-        user ? "justify-end" : "justify-start"
-      }`}
-    >
-      <div className={`flex max-w-[92%] gap-2.5 sm:max-w-[78%] ${user ? "flex-row-reverse" : ""}`}>
-        <div
-          className={`relative grid h-7 w-7 shrink-0 place-items-center rounded-full border text-[9px] ${
-            user
-              ? "border-white/10 bg-white/[0.045] text-white/40"
-              : "border-cyan-300/15 bg-cyan-300/[0.05] text-cyan-200"
-          }`}
-        >
-          {!user && (
-            <span className="absolute -inset-1 rounded-full border border-cyan-300/10 animate-pulse" />
-          )}
-          {user ? "U" : "✦"}
+    <div className="my-3 overflow-hidden rounded-xl border border-white/10 bg-[#0d1117]">
+      <div className="flex items-center justify-between border-b border-white/10 bg-black/40 px-4 py-2">
+        <span className="text-xs font-mono text-white/50">{lang || "code"}</span>
+        <button onClick={handleCopy} className="text-xs text-white/40 hover:text-cyan-300">
+          {copied ? "Copied ✓" : "Copy"}
+        </button>
+      </div>
+      <div className="overflow-x-auto p-4 text-sm font-mono text-cyan-50/90 whitespace-pre">
+        {code}
+      </div>
+    </div>
+  );
+};
+
+const formatText = (text) => {
+  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*|`.*?`)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={i} className="font-bold text-white/95">{part.slice(2, -2)}</strong>;
+    if (part.startsWith("*") && part.endsWith("*")) return <em key={i} className="italic text-white/80">{part.slice(1, -1)}</em>;
+    if (part.startsWith("`") && part.endsWith("`")) return <code key={i} className="rounded bg-white/10 px-1 py-0.5 font-mono text-[0.9em] text-cyan-300">{part.slice(1, -1)}</code>;
+    return <span key={i}>{part}</span>;
+  });
+};
+
+const Markdown = ({ content }) => {
+  const chunks = content.split(/(```[\s\S]*?```)/g);
+  return chunks.map((chunk, i) => {
+    if (chunk.startsWith("```") && chunk.endsWith("```")) {
+      const lines = chunk.slice(3, -3).split("\n");
+      return <CodeBlock key={i} lang={lines[0].trim()} code={lines.slice(1).join("\n")} />;
+    }
+    return (
+      <div key={i} className="space-y-2 text-sm leading-relaxed">
+        {chunk.split("\n").map((line, j) => {
+          if (!line.trim()) return <div key={j} className="h-1" />;
+          if (line.startsWith("# ")) return <h1 key={j} className="mt-4 text-xl font-bold">{formatText(line.slice(2))}</h1>;
+          if (line.startsWith("## ")) return <h2 key={j} className="mt-3 text-lg font-bold">{formatText(line.slice(3))}</h2>;
+          if (line.startsWith("- ")) return <li key={j} className="ml-4 list-disc">{formatText(line.slice(2))}</li>;
+          return <p key={j}>{formatText(line)}</p>;
+        })}
+      </div>
+    );
+  });
+};
+
+export default function AssistantMessage({ message }) {
+  const isUser = message.role === "user";
+
+  return (
+    <div className={`flex w-full animate-[slideUp_0.3s_ease-out] ${isUser ? "justify-end" : "justify-start"}`}>
+      <div className={`flex max-w-[85%] gap-4 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
+        <div className={`mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-lg border text-xs font-bold ${isUser ? "border-violet-500/20 bg-violet-500/10 text-violet-300" : "border-cyan-500/30 bg-cyan-500/10 text-cyan-300"}`}>
+          {isUser ? "U" : "✦"}
         </div>
-
-        <div className={user ? "items-end" : "items-start"}>
-          {!user && (
-            <div className="mb-1 px-1 text-[7px] font-semibold uppercase tracking-[0.18em] text-cyan-200/25">
-              DEVSPA
-            </div>
-          )}
-
-          <div
-            className={`rounded-2xl border px-3.5 py-2.5 text-[10px] leading-5 shadow-lg shadow-black/10 ${
-              user
-                ? "rounded-tr-md border-violet-300/15 bg-violet-500/[0.08] text-white/75"
-                : "rounded-tl-md border-cyan-300/[0.07] bg-white/[0.025] text-white/65"
-            }`}
-          >
-            {content}
+        <div className="min-w-0">
+          {!isUser && <div className="mb-1 text-[10px] font-bold uppercase tracking-widest text-cyan-400/50">DEVSPA AI</div>}
+          <div className={`rounded-2xl px-5 py-3 ${isUser ? "bg-white/[0.03] border border-white/[0.05] text-white/90" : "text-white/80"}`}>
+            <Markdown content={message.content} />
           </div>
-
-          <div className={`mt-1 px-1 text-[7px] text-white/15 ${user ? "text-right" : ""}`}>
-            {formatTime(message?.time)}
-          </div>
-
-          {message?.file && (
-            <button
-              type="button"
-              onClick={() => onOpenFile?.(message.file)}
-              className="mt-1.5 cursor-pointer rounded-lg border border-cyan-300/[0.08] bg-cyan-300/[0.025] px-2.5 py-1.5 text-[8px] text-cyan-200/60 transition-all duration-200 hover:border-cyan-300/20 hover:bg-cyan-300/[0.05] active:scale-[.98]"
-            >
-              Open {message.file}
-            </button>
-          )}
         </div>
       </div>
-    </article>
+    </div>
   );
 }
