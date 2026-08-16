@@ -52,6 +52,12 @@ app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: false }));
 
 // =====================================================
+// TRUST PROXY
+// =====================================================
+
+app.set("trust proxy", 1);
+
+// =====================================================
 // SESSION
 // =====================================================
 
@@ -64,11 +70,11 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "lax",
-  maxAge: 1000 * 60 * 60 * 24,
-},
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 1000 * 60 * 60 * 24,
+    },
   })
 );
 
