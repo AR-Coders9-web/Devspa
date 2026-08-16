@@ -78,3 +78,31 @@ button:disabled {
   opacity: 0;
   pointer-events: none;
 }
+
+
+
+
+/* DEVSPA — AI Fix modal scrolling */
+#root .fixed.inset-0 {
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+#root .fixed.inset-0 > .overflow-hidden {
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Keep the modal header and footer visible while the fix preview scrolls */
+#root .fixed.inset-0 > .overflow-hidden > .p-5 {
+  min-height: 0;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+/* Don't let the modal footer get pushed outside the viewport */
+#root .fixed.inset-0 > .overflow-hidden > .border-t {
+  flex-shrink: 0;
+}
