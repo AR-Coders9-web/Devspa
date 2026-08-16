@@ -1,398 +1,345 @@
-const {
-  getInstallations,
-  getInstallation,
-} = require("../services/githubAppService");
+const axios = require("axios");
 
 const getFrontendUrl = () =>
   process.env.FRONTEND_URL ||
   "http://localhost:5173";
 
-const getInstallUrl = () => {
-  const slug = String(
-    process.env.GITHUB_APP_SLUG ||
-      "devspa-os"
-  ).trim();
+const getGithubClientId = () =>
+  process.env.GITHUB_CLIENT_ID;
 
-  return `https://github.com/apps/${encodeURIComponent(
-    slug
-  )}/installations/new`;
+const getGithubClientSecret = () =>
+  process.env.GITHUB_CLIENT_SECRET;
+
+const getCallbackUrl = () =>
+  process.env.GITHUB_CALLBACK_URL ||
+  "http://localhost:5000/auth/github/callback";
+
+/* =========================================================
+   START GITHUB AUTH
+========================================================= */
+
+const startGithubAuth = (req, res) => {
+  try {
+    const clientId = getGithubClientId();
+
+    if (!clientId) {
+      console.error(
+        "GITHUB_CLIENT_ID is missing."
+      );
+
+      return res.redirect(
+        `${getFrontendUrl()}/?authError=github_config_missing`
+      );
+    }
+
+    /*
+     * IMPORTANT:
+     *
+     * Generate a random state value.
+     * This prevents CSRF attacks and also makes
+     * sure the callback belongs to this browser session.
+     */
+
+    const state = require("crypto")
+      .randomBytes(32)
+      .toString("hex");
+
+    req.session.githubOAuthState = state;
+
+    const params = new URLSearchParams({
+      client_id: clientId,
+      redirect_uri: getCallbackUrl(),
+      state,
+    });
+
+    return res.redirect(
+      `https://github.com/login/oauth/authorize?${params.toString()}`
+    );
+  } catch (error) {
+    console.error(
+      "GitHub auth start error:",
+      error
+    );
+
+    return res.redirect(
+      `${getFrontendUrl()}/?authError=github_auth_start_failed`
+    );
+  }
 };
 
 /* =========================================================
-   CONTINUE WITH GITHUB
+   GITHUB OAUTH CALLBACK
 ========================================================= */
 
-const startGithubAuth =
-  async (req, res) => {
-    try {
-      const installations =
-        await getInstallations();
+const githubCallback = async (req, res) => {
+  try {
+    const {
+      code,
+      state,
+      error,
+      error_description,
+    } = req.query;
 
-      /*
-       * Optional explicit installation ID.
-       * Useful if the app later has multiple installations.
-       */
-      const configuredId =
-        process.env.GITHUB_INSTALLATION_ID;
+    /* -----------------------------------------
+       User cancelled authorization
+    ----------------------------------------- */
 
-      let installation = null;
+    if (error) {
+      console.error(
+        "GitHub OAuth error:",
+        error,
+        error_description || ""
+      );
 
-      if (configuredId) {
-        installation =
-          installations.find(
-            (item) =>
-              String(item.id) ===
-              String(configuredId)
-          ) || null;
-      }
+      return res.redirect(
+        `${getFrontendUrl()}/login?authError=github_denied`
+      );
+    }
 
-      /*
-       * For the current DEVSPA setup,
-       * use the first existing installation.
-       */
-      if (
-        !installation &&
-        installations.length === 1
-      ) {
-        installation =
-          installations[0];
-      }
+    /* -----------------------------------------
+       Validate OAuth code
+    ----------------------------------------- */
 
-      /*
-       * Already installed:
-       * DO NOT send the user to GitHub again.
-       */
-      if (installation?.id) {
-        req.session.githubInstallationId =
-          installation.id;
+    if (!code) {
+      return res.redirect(
+        `${getFrontendUrl()}/login?authError=github_code_missing`
+      );
+    }
 
-        if (installation.account) {
-          req.session.user = {
-            id:
-              installation.account.id,
-            login:
-              installation.account
-                .login ||
-              installation.account
-                .name ||
-              null,
-            name:
-              installation.account
-                .name ||
-              installation.account
-                .login ||
-              null,
-            avatarUrl:
-              installation.account
-                .avatar_url ||
-              null,
-            githubUrl:
-              installation.account
-                .html_url ||
-              null,
-          };
+    /* -----------------------------------------
+       Validate state
+    ----------------------------------------- */
+
+    if (
+      !state ||
+      !req.session?.githubOAuthState ||
+      state !== req.session.githubOAuthState
+    ) {
+      console.error(
+        "GitHub OAuth state validation failed."
+      );
+
+      return res.redirect(
+        `${getFrontendUrl()}/login?authError=github_state_invalid`
+      );
+    }
+
+    /*
+     * State has now been consumed.
+     */
+    delete req.session.githubOAuthState;
+
+    /* -----------------------------------------
+       Exchange code for access token
+    ----------------------------------------- */
+
+    const tokenResponse =
+      await axios.post(
+        "https://github.com/login/oauth/access_token",
+        {
+          client_id:
+            getGithubClientId(),
+
+          client_secret:
+            getGithubClientSecret(),
+
+          code,
+
+          redirect_uri:
+            getCallbackUrl(),
+        },
+        {
+          headers: {
+            Accept:
+              "application/json",
+          },
         }
+      );
 
-        await new Promise(
-          (resolve, reject) => {
-            req.session.save(
-              (error) => {
-                if (error) {
-                  reject(error);
-                } else {
-                  resolve();
-                }
-              }
-            );
+    const accessToken =
+      tokenResponse.data?.access_token;
+
+    if (!accessToken) {
+      console.error(
+        "GitHub token exchange failed:",
+        tokenResponse.data
+      );
+
+      return res.redirect(
+        `${getFrontendUrl()}/login?authError=github_token_failed`
+      );
+    }
+
+    /* -----------------------------------------
+       Get authenticated GitHub user
+    ----------------------------------------- */
+
+    const userResponse =
+      await axios.get(
+        "https://api.github.com/user",
+        {
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`,
+
+            Accept:
+              "application/vnd.github+json",
+
+            "X-GitHub-Api-Version":
+              "2022-11-28",
+          },
+        }
+      );
+
+    const githubUser =
+      userResponse.data;
+
+    if (!githubUser?.id) {
+      throw new Error(
+        "Unable to retrieve GitHub user."
+      );
+    }
+
+    /* -----------------------------------------
+       Create browser session
+    ----------------------------------------- */
+
+    req.session.user = {
+      id: githubUser.id,
+
+      login:
+        githubUser.login ||
+        null,
+
+      name:
+        githubUser.name ||
+        githubUser.login ||
+        null,
+
+      avatarUrl:
+        githubUser.avatar_url ||
+        null,
+
+      githubUrl:
+        githubUser.html_url ||
+        null,
+    };
+
+    /*
+     * Store token server-side in the session.
+     *
+     * Do NOT send this token to the frontend.
+     */
+    req.session.githubAccessToken =
+      accessToken;
+
+    await new Promise(
+      (resolve, reject) => {
+        req.session.save(
+          (error) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve();
+            }
           }
         );
-
-        console.log(
-          "GitHub App session restored:",
-          installation.account
-            ?.login ||
-            "unknown",
-          installation.id
-        );
-
-        return res.redirect(
-          getFrontendUrl()
-        );
       }
+    );
 
-      /*
-       * App isn't installed yet.
-       * Send user to GitHub installation.
-       */
-      return res.redirect(
-        getInstallUrl()
-      );
-    } catch (error) {
-      console.error(
-        "GitHub auth start error:",
+    console.log(
+      "GitHub user authenticated:",
+      githubUser.login
+    );
+
+    return res.redirect(
+      `${getFrontendUrl()}/home`
+    );
+  } catch (error) {
+    console.error(
+      "GitHub OAuth callback error:",
+      error.response?.data ||
+        error.message ||
         error
-      );
+    );
 
-      return res.redirect(
-        `${getFrontendUrl()}/?authError=github_app_failed`
-      );
+    if (res.headersSent) {
+      return;
     }
-  };
 
-/* =========================================================
-   GITHUB APP INSTALLATION CALLBACK
-========================================================= */
-
-const githubCallback =
-  async (req, res) => {
-    try {
-      const {
-        installation_id,
-        setup_action,
-      } = req.query;
-
-      if (!installation_id) {
-        return res.redirect(
-          `${getFrontendUrl()}/?authError=github_installation_missing`
-        );
-      }
-
-      /*
-       * Never blindly trust installation_id.
-       * Verify it through the GitHub App API.
-       */
-      const installation =
-        await getInstallation(
-          installation_id
-        );
-
-      if (!installation?.id) {
-        throw new Error(
-          "GitHub installation could not be verified."
-        );
-      }
-
-      req.session.githubInstallationId =
-        installation.id;
-
-      if (installation.account) {
-        req.session.user = {
-          id:
-            installation.account.id,
-          login:
-            installation.account
-              .login ||
-            installation.account
-              .name ||
-            null,
-          name:
-            installation.account
-              .name ||
-            installation.account
-              .login ||
-            null,
-          avatarUrl:
-            installation.account
-              .avatar_url ||
-            null,
-          githubUrl:
-            installation.account
-              .html_url ||
-            null,
-        };
-      }
-
-      await new Promise(
-        (resolve, reject) => {
-          req.session.save(
-            (error) => {
-              if (error) {
-                reject(error);
-              } else {
-                resolve();
-              }
-            }
-          );
-        }
-      );
-
-      console.log(
-        "GitHub App installation connected:",
-        installation.account
-          ?.login ||
-          "unknown",
-        installation.id,
-        setup_action ||
-          "unknown"
-      );
-
-      return res.redirect(
-        getFrontendUrl()
-      );
-    } catch (error) {
-      console.error(
-        "GitHub App callback error:",
-        error
-      );
-
-      if (res.headersSent) {
-        return;
-      }
-
-      return res.redirect(
-        `${getFrontendUrl()}/?authError=github_app_failed`
-      );
-    }
-  };
+    return res.redirect(
+      `${getFrontendUrl()}/login?authError=github_auth_failed`
+    );
+  }
+};
 
 /* =========================================================
    CURRENT USER
 ========================================================= */
 
-const getCurrentUser =
-  async (req, res) => {
-    try {
-      /*
-       * First use session if available.
-       */
-      if (req.session?.user) {
-        return res.json({
-          authenticated: true,
-          user: req.session.user,
-        });
-      }
-
-      /*
-       * Session may disappear after nodemon restart.
-       * Recover directly from GitHub App installation.
-       */
-      const installations =
-        await getInstallations();
-
-      if (!installations.length) {
-        return res.status(401).json({
-          authenticated: false,
-          user: null,
-        });
-      }
-
-      let installation = null;
-
-      const configuredId =
-        process.env.GITHUB_INSTALLATION_ID;
-
-      if (configuredId) {
-        installation =
-          installations.find(
-            (item) =>
-              String(item.id) ===
-              String(configuredId)
-          ) || null;
-      }
-
-      if (
-        !installation &&
-        installations.length === 1
-      ) {
-        installation =
-          installations[0];
-      }
-
-      if (!installation) {
-        return res.status(409).json({
-          authenticated: false,
-          user: null,
-          message:
-            "Multiple GitHub App installations found.",
-        });
-      }
-
-      const user = {
-        id:
-          installation.account?.id ||
-          null,
-        login:
-          installation.account
-            ?.login ||
-          installation.account
-            ?.name ||
-          null,
-        name:
-          installation.account
-            ?.name ||
-          installation.account
-            ?.login ||
-          null,
-        avatarUrl:
-          installation.account
-            ?.avatar_url ||
-          null,
-        githubUrl:
-          installation.account
-            ?.html_url ||
-          null,
-      };
-
-      req.session.githubInstallationId =
-        installation.id;
-
-      req.session.user = user;
-
-      await new Promise(
-        (resolve) => {
-          req.session.save(
-            () => resolve()
-          );
-        }
-      );
-
-      return res.json({
-        authenticated: true,
-        user,
-      });
-    } catch (error) {
-      console.error(
-        "Get current GitHub user error:",
-        error
-      );
-
-      return res.status(500).json({
+const getCurrentUser = async (
+  req,
+  res
+) => {
+  try {
+    if (!req.session?.user) {
+      return res.status(401).json({
         authenticated: false,
         user: null,
-        message:
-          "Unable to restore GitHub session.",
       });
     }
-  };
+
+    return res.json({
+      authenticated: true,
+      user: req.session.user,
+    });
+  } catch (error) {
+    console.error(
+      "Get current GitHub user error:",
+      error
+    );
+
+    return res.status(500).json({
+      authenticated: false,
+      user: null,
+      message:
+        "Unable to check GitHub session.",
+    });
+  }
+};
 
 /* =========================================================
    LOGOUT
 ========================================================= */
 
-const logout =
-  (req, res) => {
-    req.session.destroy(
-      (error) => {
-        if (error) {
-          return res.status(500).json({
-            success: false,
-            message:
-              "Logout failed.",
-          });
-        }
-
-        res.clearCookie(
-          "devspa.sid"
+const logout = (req, res) => {
+  req.session.destroy(
+    (error) => {
+      if (error) {
+        console.error(
+          "Logout error:",
+          error
         );
 
-        return res.json({
-          success: true,
+        return res.status(500).json({
+          success: false,
           message:
-            "Logged out successfully.",
+            "Logout failed.",
         });
       }
-    );
-  };
+
+      res.clearCookie(
+        "devspa.sid"
+      );
+
+      return res.json({
+        success: true,
+        message:
+          "Logged out successfully.",
+      });
+    }
+  );
+};
 
 module.exports = {
   startGithubAuth,
